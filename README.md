@@ -2,7 +2,7 @@
 
 A URL shortener built with TypeScript, Fastify, Postgres and Redis, with a focus on the engineering behind it: caching, rate limiting, click analytics and measured performance.
 
-> **Status:** work in progress. Project setup, config validation and a `/health` endpoint are done. The shortening and redirect features are next.
+
 
 ## Stack
 
@@ -23,15 +23,7 @@ npm install
 npm run dev              # http://localhost:3000/health
 ```
 
-## Roadmap
 
-- [x] Project setup, typed config, `/health` endpoint
-- [ ] Database migrations and `POST /shorten`
-- [ ] `GET /:code` redirect with Redis cache-aside
-- [ ] Rate limiting, URL validation (including SSRF protection)
-- [ ] Click analytics written in batches, off the redirect path
-- [ ] Dockerfile, CI, load tests with benchmark results
-- [ ] Design decisions and capacity estimates in `docs/`
 
 ## Project layout
 
