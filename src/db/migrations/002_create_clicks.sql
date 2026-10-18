@@ -1,0 +1,1 @@
+-- clicks table: url_id, clicked_at, referrer, user_agent. Think about indexes and partitioning.
