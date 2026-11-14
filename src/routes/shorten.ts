@@ -3,13 +3,20 @@ import type { FastifyInstance } from "fastify";
 import {z} from "zod"
 import { config } from "../config.js";
 import { createShortUrl } from "../services/urlService.js";
+import { rateLimit } from "../middleware/rateLimit.js";
 
 const bodySchema = z.object({
     url: z.url({protocol: /^https?$/}).max(2048),
 })
 
 export async function shortenRoutes(app: FastifyInstance) {
-  app.post("/shorten", async (request, reply) => {
+  const limiter = rateLimit({
+    name: "shorten",
+    limit: config.RATE_LIMIT_SHORTEN_MAX,
+    windowSeconds: config.RATE_LIMIT_WINDOW_SECONDS,
+  })
+
+  app.post("/shorten", { preHandler: limiter }, async (request, reply) => {
     const parsed = bodySchema.safeParse(request.body)
     if (!parsed.success) {
       return reply.status(400).send({

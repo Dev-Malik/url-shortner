@@ -7,5 +7,7 @@ import { defineConfig } from "vitest/config"
 const fileEnv = existsSync(".env") ? parseEnv(readFileSync(".env", "utf8")) : {}
 
 export default defineConfig({
-  test: { env: fileEnv },
+  // High limit so the many POSTs made by the test suite never hit the rate limiter by accident.
+  // The rate limiter has its own tests with small limits.
+  test: { env: { ...fileEnv, RATE_LIMIT_SHORTEN_MAX: "1000" } },
 })
