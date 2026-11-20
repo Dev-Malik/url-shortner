@@ -1,9 +1,17 @@
-import { describe, it, expect, vi, afterEach } from "vitest"
+import { describe, it, expect, vi, afterEach, beforeAll } from "vitest"
 import { randomUUID } from "node:crypto"
 import Fastify from "fastify"
 import { redis } from "../../src/cache/redis.js"
 import { checkRateLimit } from "../../src/services/rateLimiter.js"
 import { rateLimit } from "../../src/middleware/rateLimit.js"
+
+// The client starts out "connecting" and rejects commands until it is ready (fail-fast setting),
+// so wait for the connection before the real-Redis tests run.
+beforeAll(async () => {
+  if (redis.status !== "ready") {
+    await new Promise<void>((resolve) => redis.once("ready", () => resolve()))
+  }
+})
 
 afterEach(() => {
   vi.restoreAllMocks()

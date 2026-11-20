@@ -25,6 +25,6 @@ export async function shortenRoutes(app: FastifyInstance) {
     }
 
     const code = await createShortUrl(parsed.data.url)
-    return reply.status(201).send({ code, shortUrl: `${config.BASE_URL}/${code}` })
+    return reply.status(201).send({ code, shortUrl: `${config.PUBLIC_BASE_URL}/${code}` })
   })
 }

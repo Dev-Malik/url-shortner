@@ -15,7 +15,7 @@ describe("POST /shorten", () => {
     expect(response.statusCode).toBe(201)
     const body = response.json()
     expect(body.code).toMatch(/^[0-9A-Za-z]{7}$/)
-    expect(body.shortUrl).toBe(`${config.BASE_URL}/${body.code}`)
+    expect(body.shortUrl).toBe(`${config.PUBLIC_BASE_URL}/${body.code}`)
 
     await app.close()
   })

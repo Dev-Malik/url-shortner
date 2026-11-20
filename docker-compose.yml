@@ -1,4 +1,10 @@
 # Services: app, postgres, redis (with healthchecks), later nginx + multiple app replicas.
+x-app-env: &app-env
+  PORT: 3000
+  PUBLIC_BASE_URL: http://localhost:${APP_PORT:-3001}
+  DATABASE_URL: postgres://shadow:debu@postgres:5432/urlshort
+  REDIS_URL: redis://redis:6379
+
 services:
   postgres:
     image: postgres:17
@@ -25,6 +31,32 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  # One-shot job: applies SQL migrations, then exits. The app only starts after it succeeds.
+  migrate:
+    build: .
+    command: ["node", "dist/db/migrate.js"]
+    environment: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build: .
+    ports:
+      - "${APP_PORT:-3001}:3000"
+    environment: *app-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
 
 volumes:
   pgdata:
